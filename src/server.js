@@ -5,7 +5,8 @@ const listEndpoints = require("express-list-endpoints")
 const mongoose = require("mongoose")
 
 const articlesRouter = require("./services/articles")
-
+const authorRouter = require("./services/authors")
+const userRouter = require("./services/users")
 const {
     notFoundErrorHandler,
     unauthorizedErrorHandler,
@@ -22,6 +23,8 @@ server.use(express.json())
 server.use(cors())
 
 server.use("/articles",articlesRouter)
+server.use("/authors",authorRouter)
+server.use("/users",userRouter)
 
 server.use(notFoundErrorHandler)
 server.use(unauthorizedErrorHandler)
