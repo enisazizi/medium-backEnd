@@ -3,14 +3,14 @@ const Author = require("../authors/schema")
 
 const authenticate = async author => {
   try {
-    const newAccessToken = await generateJWT({ _id: author._id })
-    const newRefreshToken = await generateRefreshJWT({ _id: author._id })
+    const accessToken = await generateJWT({ _id: author._id })
+    const refreshToken = await generateRefreshJWT({ _id: author._id })
 
-    author.refreshTokens = author.refreshTokens.concat({ token: newRefreshToken })
+    author.refreshTokens = author.refreshTokens.concat({ token: refreshToken })
     console.log(author.refreshTokens,"----------")
     await author.save()
 
-    return { token: newAccessToken, refreshToken: newRefreshToken }
+    return { accessToken,refreshToken }
   } catch (error) {
     console.log(error)
     throw new Error(error)
@@ -86,7 +86,7 @@ const refreshToken = async oldRefreshToken => {
 
   await author.save()
 
-  return { token: newAccessToken, refreshToken: newRefreshToken }
+  return { accessToken: newAccessToken, refreshToken: newRefreshToken }
 }
 
 module.exports = { authenticate, verifyJWT, refreshToken }

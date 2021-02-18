@@ -1,12 +1,15 @@
 const express = require("express")
 const cors = require("cors")
-const {join} = require("path")
 const listEndpoints = require("express-list-endpoints")
 const mongoose = require("mongoose")
-
+const passport = require("passport")
+const cookieParser = require("cookie-parser")
 const articlesRouter = require("./services/articles")
 const authorRouter = require("./services/authors")
-const userRouter = require("./services/users")
+
+
+const oauth = require("./services/auth/oauth")
+
 const {
     notFoundErrorHandler,
     unauthorizedErrorHandler,
@@ -16,15 +19,26 @@ const {
   } = require("./errorHandlers")
 
 const server = express()
-
+const whitelist = ["http://localhost:3000"]
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (whitelist.indexOf(origin) !== -1 || !origin) {
+      callback(null, true)
+    } else {
+      callback(new Error("Not allowed by CORS"))
+    }
+  },
+  credentials: true,
+}
 const port = process.env.PORT
-
+server.use(cors(corsOptions))
 server.use(express.json())
-server.use(cors())
+server.use(cookieParser())
+server.use(passport.initialize())
 
 server.use("/articles",articlesRouter)
 server.use("/authors",authorRouter)
-server.use("/users",userRouter)
+
 
 server.use(notFoundErrorHandler)
 server.use(unauthorizedErrorHandler)

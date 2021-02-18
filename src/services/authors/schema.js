@@ -1,24 +1,21 @@
 const { Schema, model } = require("mongoose")
 const bcrypt = require("bcryptjs")
 
-const AuthorSchema = new Schema({
-  username: {
-    type:String,
-    required:true,
-    unique:true,
-  },
-  password: {
-    type:String,
-    required:true,
-  },
-  refreshTokens: [
-    {
-      token: {
-        type: String,
-      },
+const AuthorSchema = new Schema(
+  {
+  
+    name: String,
+    surname: String,
+    password: String,
+    email: String,
+    role: {
+      type: String,
+      enum: ["Admin", "User"],
     },
-  ],
-})
+    refreshTokens: [{ token: { type: String } }],
+    googleId: String,
+  },
+  { timestamps: true })
 
 
 AuthorSchema.methods.toJSON = function(){
@@ -31,8 +28,8 @@ AuthorSchema.methods.toJSON = function(){
   return authorObj
 }
 
-AuthorSchema.statics.findByCredentials = async function(username,plainPw){
-  const author = await this.findOne({username})
+AuthorSchema.statics.findByCredentials = async function(email,plainPw){
+  const author = await this.findOne({email})
 
       if(author){
         const isMatch = await bcrypt.compare(plainPw,author.password)
@@ -45,6 +42,8 @@ AuthorSchema.statics.findByCredentials = async function(username,plainPw){
         return null
       }
 }
+
+// passport-google-oauth20
 
 AuthorSchema.pre("save", async function(next){
   const author = this 
